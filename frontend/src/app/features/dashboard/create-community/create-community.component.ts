@@ -2,7 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommunityService } from '../../../core/services/community.service';
-import { Router } from '@angular/router';
+import { Router } from "@angular/router";
+import { ToastService } from "../../../shared/toast/toast.service";
 
 @Component({
   selector: 'app-create-community',
@@ -57,6 +58,7 @@ import { Router } from '@angular/router';
 export class CreateCommunityComponent {
   private communityService = inject(CommunityService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   name = '';
   description = '';
@@ -67,11 +69,11 @@ export class CreateCommunityComponent {
     this.loading.set(true);
     this.communityService.createCommunity(this.name, this.description, this.isPrivate).subscribe({
       next: () => {
-        alert('Comunidade criada com sucesso!');
+        this.toastService.show('Comunidade criada com sucesso!', 'success');
         this.router.navigate(['/dashboard/my-communities']);
       },
       error: (err) => {
-        alert('Falha ao criar comunidade: ' + (err.error?.message || 'Erro desconhecido'));
+        this.toastService.show('Falha ao criar comunidade: ' + (err.error?.message || 'Erro desconhecido'), 'error');
         this.loading.set(false);
       },
     });

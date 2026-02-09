@@ -37,4 +37,8 @@ export class CommunityService {
   getCommunityMembers(communityId: string): Observable<Membership[]> {
     return this.http.get<Membership[]>(`${this.apiUrl}/${communityId}/members`);
   }
+
+  getCommunityDetails(communityId: string): Observable<Community> {
+    return this.http.get<Community>(`${this.apiUrl}/${communityId}`);
+  }
 }

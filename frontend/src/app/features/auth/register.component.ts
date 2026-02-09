@@ -2,6 +2,7 @@ import { Component, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
+import { ToastService } from "../../shared/toast/toast.service";
 import { AuthService } from "../../core/services/auth.service";
 
 @Component({
@@ -73,6 +74,7 @@ import { AuthService } from "../../core/services/auth.service";
 export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   fullName = "";
   email = "";
@@ -83,14 +85,11 @@ export class RegisterComponent {
     this.loading.set(true);
     this.authService.register(this.fullName, this.email, this.password).subscribe({
       next: () => {
-        alert("Usuário criado com sucesso!");
+        this.toastService.show("Usuário criado com sucesso!", "success");
         this.router.navigate(["/login"]); // Redireciona para o login após o registro
       },
       error: (err) => {
-        alert(
-          "Erro ao criar usuário: " +
-            (err.error?.message || "Erro desconhecido"),
-        );
+        this.toastService.show("Erro ao criar usuário: " + (err.error?.message || "Erro desconhecido"), "error");
         this.loading.set(false);
       },
     });

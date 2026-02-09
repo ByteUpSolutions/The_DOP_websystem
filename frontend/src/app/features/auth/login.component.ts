@@ -2,6 +2,7 @@ import { Component, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { Router, RouterModule } from "@angular/router";
+import { ToastService } from "../../shared/toast/toast.service";
 import { AuthService } from "../../core/services/auth.service";
 
 @Component({
@@ -58,6 +59,7 @@ import { AuthService } from "../../core/services/auth.service";
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   email = "";
   password = "";
@@ -70,7 +72,7 @@ export class LoginComponent {
         this.router.navigate(["/dashboard"]); // Redirecionar para o dashboard após login
       },
       error: (err) => {
-        alert("Falha no login: " + (err.error?.message || "Verifique seus dados"));
+        this.toastService.show("Falha no login: " + (err.error?.message || "Verifique seus dados"), "error");
         this.loading.set(false);
       },
     });

@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/communities").permitAll()
                         // Rotas privadas (todo o resto)
+                        .requestMatchers("/api/posts/**").authenticated()
                         .anyRequest().authenticated())
                 // ADICIONADO: Insere nosso filtro antes do filtro padrão de usuário/senha
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

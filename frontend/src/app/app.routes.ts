@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { DashboardComponent } from "./features/dashboard/dashboard.component";
+import { CommunityLayoutComponent } from "./features/community/community-layout.component";
+import { CreatePostComponent } from "./features/post/create-post/create-post.component";
+import { PostDetailComponent } from "./features/post/post-detail/post-detail.component";
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent) },
@@ -10,6 +13,9 @@ export const routes: Routes = [
     component: DashboardComponent, 
     canActivate: [authGuard],
     children: [
+      { path: 'community/:id', component: CommunityLayoutComponent },
+      { path: 'community/:communityId/create-post', component: CreatePostComponent },
+      { path: 'post/:id', component: PostDetailComponent },
       { path: '', redirectTo: 'communities', pathMatch: 'full' },
       { path: 'communities', loadComponent: () => import('./features/dashboard/community-list/community-list.component').then(m => m.CommunityListComponent) },
       { path: 'my-communities', loadComponent: () => import('./features/dashboard/my-communities/my-communities.component').then(m => m.MyCommunitiesComponent) },
