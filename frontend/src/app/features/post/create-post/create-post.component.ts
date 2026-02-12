@@ -1,4 +1,4 @@
-'''
+
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -63,8 +63,8 @@ export class CreatePostComponent {
 
   onSubmit(): void {
     if (!this.communityId) {
-        this.toastService.show('ID da comunidade não encontrado!', 'error');
-        return;
+      this.toastService.show('ID da comunidade não encontrado!', 'error');
+      return;
     }
     this.loading.set(true);
     this.postService.createPost(this.communityId, this.title, this.content).subscribe({
@@ -79,4 +79,4 @@ export class CreatePostComponent {
     });
   }
 }
-'''
+

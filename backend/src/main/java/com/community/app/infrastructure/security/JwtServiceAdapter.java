@@ -1,7 +1,6 @@
 package com.community.app.infrastructure.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +9,9 @@ import java.util.Date;
 
 @Component
 public class JwtServiceAdapter implements JwtServicePort {
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // EM PRODUÇÃO: Usar variável de ambiente!
+    private static final String SECRET_STRING = "seusecretomuitoseguroquevemdavariaveldeambiente123456";
+    private static final Key key = Keys.hmacShaKeyFor(SECRET_STRING.getBytes());
     private static final long EXPIRATION_TIME = 86400000; // 1 day
 
     @Override

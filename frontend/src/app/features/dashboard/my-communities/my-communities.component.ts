@@ -22,8 +22,8 @@ import { RouterLink } from '@angular/router';
                {{ membership.role }}
              </span>
              <div class="space-x-2">
-                <a [routerLink]="['/dashboard/chat', membership.community.id]" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
-                  Chat
+                <a [routerLink]="['/dashboard/community', membership.community.id]" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+                  Abrir
                 </a>
                 <button (click)="leaveCommunity(membership.community.id)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
                   Sair

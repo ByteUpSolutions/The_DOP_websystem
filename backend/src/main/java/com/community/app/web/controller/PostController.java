@@ -24,7 +24,9 @@ public class PostController {
     private final VoteUseCase voteUseCase;
     private final UserRepository userRepository;
 
-    public PostController(CreatePostUseCase createPostUseCase, ListCommunityPostsUseCase listCommunityPostsUseCase, GetPostDetailsUseCase getPostDetailsUseCase, CreateCommentUseCase createCommentUseCase, VoteUseCase voteUseCase, UserRepository userRepository) {
+    public PostController(CreatePostUseCase createPostUseCase, ListCommunityPostsUseCase listCommunityPostsUseCase,
+            GetPostDetailsUseCase getPostDetailsUseCase, CreateCommentUseCase createCommentUseCase,
+            VoteUseCase voteUseCase, UserRepository userRepository) {
         this.createPostUseCase = createPostUseCase;
         this.listCommunityPostsUseCase = listCommunityPostsUseCase;
         this.getPostDetailsUseCase = getPostDetailsUseCase;
@@ -34,35 +36,46 @@ public class PostController {
     }
 
     @PostMapping("/communities/{id}/posts")
-    public ResponseEntity<PostDTOs.PostResponse> createPost(@PathVariable UUID id, @RequestBody PostDTOs.CreatePostRequest request) {
+    public ResponseEntity<PostDTOs.PostResponse> createPost(@PathVariable UUID id,
+            @RequestBody PostDTOs.CreatePostRequest request) {
         User currentUser = getCurrentUser();
         var post = createPostUseCase.execute(request.title(), request.content(), currentUser, id);
         return ResponseEntity.ok(PostDTOs.PostResponse.fromDomain(post));
     }
 
     @GetMapping("/communities/{id}/posts")
-    public ResponseEntity<List<PostDTOs.PostResponse>> listPosts(@PathVariable UUID id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<PostDTOs.PostResponse>> listPosts(@PathVariable UUID id,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         var posts = listCommunityPostsUseCase.execute(id, page, size);
         return ResponseEntity.ok(posts.stream().map(PostDTOs.PostResponse::fromDomain).collect(Collectors.toList()));
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<GetPostDetailsUseCase.PostDetails> getPostDetails(@PathVariable UUID id) {
-        return ResponseEntity.ok(getPostDetailsUseCase.execute(id));
+    public ResponseEntity<PostDTOs.PostDetailsResponse> getPostDetails(@PathVariable UUID id) {
+        var details = getPostDetailsUseCase.execute(id);
+        var postResponse = PostDTOs.PostResponse.fromDomain(details.post());
+        var commentsResponse = details.comments().stream()
+                .map(com.community.app.web.dto.post.CommentDTOs.CommentResponse::fromDomain)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new PostDTOs.PostDetailsResponse(postResponse, commentsResponse));
     }
 
     @PostMapping("/posts/{id}/comments")
-    public ResponseEntity<Void> createComment(@PathVariable UUID id, @RequestBody PostDTOs.CreateCommentRequest request) {
+    public ResponseEntity<Void> createComment(@PathVariable UUID id,
+            @RequestBody PostDTOs.CreateCommentRequest request) {
         User currentUser = getCurrentUser();
         createCommentUseCase.execute(request.content(), currentUser, id, request.parentCommentId());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/posts/{id}/vote")
-    public ResponseEntity<Void> voteOnPost(@PathVariable UUID id, @RequestBody PostDTOs.VoteRequest request) {
+    public ResponseEntity<PostDTOs.PostResponse> voteOnPost(@PathVariable UUID id,
+            @RequestBody PostDTOs.VoteRequest request) {
         User currentUser = getCurrentUser();
-        voteUseCase.executeForPost(currentUser, id, com.community.app.domain.post.Vote.VoteType.valueOf(request.type()));
-        return ResponseEntity.ok().build();
+        var post = voteUseCase.executeForPost(currentUser, id,
+                com.community.app.domain.post.Vote.VoteType.valueOf(request.type()));
+        return ResponseEntity.ok(PostDTOs.PostResponse.fromDomain(post));
     }
 
     private User getCurrentUser() {

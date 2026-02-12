@@ -34,6 +34,8 @@ public class VoteRepositoryAdapter implements VoteRepository {
 
     @Override
     public void delete(Vote vote) {
-        jpaRepository.delete(PostMapper.toJpaEntity(vote));
+        if (vote.id() != null) {
+            jpaRepository.deleteById(vote.id());
+        }
     }
 }

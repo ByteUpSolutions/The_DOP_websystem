@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class CommentRepositoryAdapter implements CommentRepository {
 
     private final CommentJpaRepository jpaRepository;
@@ -18,6 +19,7 @@ public class CommentRepositoryAdapter implements CommentRepository {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public Comment save(Comment comment) {
         CommentJpaEntity entity = PostMapper.toJpaEntity(comment);
         return PostMapper.toDomain(jpaRepository.save(entity));

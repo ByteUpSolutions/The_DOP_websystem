@@ -1,4 +1,4 @@
-import { Component, signal, effect, inject, OnInit } from '@angular/core';
+import { Component, signal, effect, inject, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -25,7 +25,7 @@ interface Message {
     <div class="flex flex-col h-full bg-gray-100 p-4 rounded-lg shadow-inner">
       <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
         <span>{{ community()?.name || 'Carregando...' }}</span>
-        <span *ngIf="!community() && communityId()" class="text-sm font-normal text-gray-500">({{ communityId() }})</span>
+        <span *ngIf="!community() && activeCommunityId()" class="text-sm font-normal text-gray-500">({{ activeCommunityId() }})</span>
         
         <!-- Status Indicator -->
         <span *ngIf="connectionStatus() === 'connecting'" class="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">Conectando...</span>
@@ -83,7 +83,15 @@ export class ChatWindowComponent implements OnInit {
 
   messages = signal<Message[]>([]);
   newMessage = '';
-  communityId = signal<string | null>(null);
+  activeCommunityId = signal<string | null>(null);
+
+  @Input() set communityId(id: string | null) {
+    if (id) {
+      this.activeCommunityId.set(id);
+      this.loadMessages(id);
+      this.loadCommunityDetails(id);
+    }
+  }
   community = signal<Community | undefined>(undefined);
 
   connectionStatus = signal<'connecting' | 'connected' | 'error'>('connecting');
@@ -113,7 +121,7 @@ export class ChatWindowComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('communityId');
-      this.communityId.set(id);
+      this.activeCommunityId.set(id);
       if (id) {
         this.loadMessages(id);
         this.loadCommunityDetails(id);
@@ -154,10 +162,10 @@ export class ChatWindowComponent implements OnInit {
   }
 
   async sendMessage() {
-    if (!this.newMessage.trim() || !this.communityId() || !this.authService.currentUser()) return;
+    if (!this.newMessage.trim() || !this.activeCommunityId() || !this.authService.currentUser()) return;
 
     try {
-      const msgCollection = collection(this.firestore, `communities/${this.communityId()}/messages`);
+      const msgCollection = collection(this.firestore, `communities/${this.activeCommunityId()}/messages`);
       await addDoc(msgCollection, {
         text: this.newMessage,
         senderId: this.authService.currentUser()?.id,

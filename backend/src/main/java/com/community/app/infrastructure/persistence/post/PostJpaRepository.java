@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PostJpaRepository extends JpaRepository<PostJpaEntity, UUID> {
-    List<PostJpaEntity> findByCommunityId(UUID communityId, Pageable pageable);
+    List<PostJpaEntity> findByCommunity_Id(UUID communityId, Pageable pageable);
 }

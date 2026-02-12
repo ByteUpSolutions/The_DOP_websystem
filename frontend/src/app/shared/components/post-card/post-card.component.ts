@@ -39,6 +39,13 @@ export class PostCardComponent {
   private postService = inject(PostService);
 
   vote(type: 'UP' | 'DOWN') {
-    this.postService.voteOnPost(this.post.id, type).subscribe();
+    this.postService.voteOnPost(this.post.id, type).subscribe({
+      next: (updatedPost: Post) => {
+        this.post = updatedPost;
+      },
+      error: (error: unknown) => {
+        console.error('Error voting on post:', error);
+      }
+    });
   }
 }

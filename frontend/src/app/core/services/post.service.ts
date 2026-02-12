@@ -26,7 +26,7 @@ export class PostService {
     return this.http.post(`${this.apiUrl}/posts/${postId}/comments`, { content, parentCommentId });
   }
 
-  voteOnPost(postId: string, type: 'UP' | 'DOWN'): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/posts/${postId}/vote`, { type });
+  voteOnPost(postId: string, type: 'UP' | 'DOWN'): Observable<Post> {
+    return this.http.post<Post>(`${this.apiUrl}/posts/${postId}/vote`, { type });
   }
 }

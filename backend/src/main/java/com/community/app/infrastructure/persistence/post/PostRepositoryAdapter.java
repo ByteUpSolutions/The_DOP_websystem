@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class PostRepositoryAdapter implements PostRepository {
 
     private final PostJpaRepository jpaRepository;
@@ -20,19 +21,24 @@ public class PostRepositoryAdapter implements PostRepository {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public Post save(Post post) {
+        System.out.println("Saving post: " + post.id() + ", Upvotes: " + post.upvotes());
         PostJpaEntity entity = PostMapper.toJpaEntity(post);
-        return PostMapper.toDomain(jpaRepository.save(entity));
+        PostJpaEntity savedEntity = jpaRepository.save(entity);
+        System.out.println("Saved entity: " + savedEntity.getId() + ", Upvotes: " + savedEntity.getUpvotes());
+        return PostMapper.toDomain(savedEntity);
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public Optional<Post> findById(UUID id) {
         return jpaRepository.findById(id).map(PostMapper::toDomain);
     }
 
     @Override
     public List<Post> findByCommunityId(UUID communityId, int page, int size) {
-        return jpaRepository.findByCommunityId(communityId, PageRequest.of(page, size))
+        return jpaRepository.findByCommunity_Id(communityId, PageRequest.of(page, size))
                 .stream()
                 .map(PostMapper::toDomain)
                 .collect(Collectors.toList());

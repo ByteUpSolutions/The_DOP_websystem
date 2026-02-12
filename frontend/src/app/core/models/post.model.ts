@@ -16,4 +16,9 @@ export interface Comment {
   content: string;
   author: User;
   createdAt: string;
+  parentCommentId?: string | null;
+}
+
+export interface CommentNode extends Comment {
+  children: CommentNode[];
 }
