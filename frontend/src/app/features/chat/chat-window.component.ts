@@ -58,14 +58,15 @@ interface Message {
       
       <div class="flex gap-2">
         <input 
-          [(ngModel)]="newMessage" 
+          [ngModel]="newMessage()" 
+          (ngModelChange)="newMessage.set($event)"
           (keyup.enter)="sendMessage()"
           placeholder="Digite sua mensagem..." 
           class="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <button 
           (click)="sendMessage()" 
-          [disabled]="!newMessage.trim() || !authService.isAuthenticated()"
+          [disabled]="!newMessage().trim() || !authService.isAuthenticated()"
           class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           Enviar
         </button>
@@ -82,7 +83,7 @@ export class ChatWindowComponent implements OnInit {
   private communityService = inject(CommunityService);
 
   messages = signal<Message[]>([]);
-  newMessage = '';
+  newMessage = signal('');
   activeCommunityId = signal<string | null>(null);
 
   @Input() set communityId(id: string | null) {
@@ -100,13 +101,11 @@ export class ChatWindowComponent implements OnInit {
   constructor() {
     effect(() => {
       const chatToken = this.authService.chatToken();
-      console.log('ChatWindow: Chat token changed', chatToken ? 'Token present' : 'Token missing');
 
       if (chatToken) {
         this.connectionStatus.set('connecting');
         signInWithCustomToken(this._firebaseAuth, chatToken)
           .then(userCredential => {
-            console.log('ChatWindow: Firebase sign-in successful', userCredential.user.uid);
             this.connectionStatus.set('connected');
           })
           .catch(err => {
@@ -121,8 +120,9 @@ export class ChatWindowComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('communityId');
-      this.activeCommunityId.set(id);
+      // Only set if we have a value from the route, to avoid overwriting the @Input value
       if (id) {
+        this.activeCommunityId.set(id);
         this.loadMessages(id);
         this.loadCommunityDetails(id);
       }
@@ -137,11 +137,7 @@ export class ChatWindowComponent implements OnInit {
   }
 
   loadMessages(communityId: string): void {
-    console.log('ChatWindow: Initializing message listener for community', communityId);
-
     authState(this._firebaseAuth).subscribe(user => {
-      console.log('ChatWindow: Auth state changed', user ? 'User authenticated' : 'User not authenticated');
-
       if (user) {
         const msgCollection = collection(this.firestore, `communities/${communityId}/messages`);
         const q = query(msgCollection, orderBy('timestamp', 'desc'), limit(50));
@@ -162,18 +158,19 @@ export class ChatWindowComponent implements OnInit {
   }
 
   async sendMessage() {
-    if (!this.newMessage.trim() || !this.activeCommunityId() || !this.authService.currentUser()) return;
+    if (!this.newMessage().trim() || !this.activeCommunityId() || !this.authService.currentUser()) {
+      return;
+    }
 
     try {
       const msgCollection = collection(this.firestore, `communities/${this.activeCommunityId()}/messages`);
       await addDoc(msgCollection, {
-        text: this.newMessage,
+        text: this.newMessage(),
         senderId: this.authService.currentUser()?.id,
         senderName: this.authService.currentUser()?.fullName,
         timestamp: new Date()
       });
-      console.log('ChatWindow: Message sent successfully');
-      this.newMessage = '';
+      this.newMessage.set('');
     } catch (err: any) {
       console.error('ChatWindow: Error sending message', err);
       alert('Erro ao enviar mensagem: ' + err.message);
