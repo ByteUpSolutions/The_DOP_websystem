@@ -6,10 +6,10 @@ import { AuthService } from '../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-    selector: 'app-navbar',
-    standalone: true,
-    imports: [CommonModule, RouterLink, FormsModule],
-    template: `
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterLink, FormsModule],
+  template: `
     <nav class="bg-white border-b border-gray-200 px-4 h-16 flex items-center justify-between fixed top-0 w-full z-50">
       <!-- Logo / Brand -->
       <div class="flex items-center">
@@ -89,7 +89,7 @@ import { FormsModule } from '@angular/forms';
     <!-- Spacer for fixed navbar -->
     <div class="h-16"></div>
   `,
-    styles: [`
+  styles: [`
     .animate-fade-in-down {
       animation: fadeInDown 0.2s ease-out;
     }
@@ -106,37 +106,37 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class NavbarComponent {
-    private authService = inject(AuthService);
-    private router = inject(Router);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-    currentUser = this.authService.currentUser;
-    searchQuery = '';
-    isUserMenuOpen = signal(false);
+  currentUser = this.authService.currentUser;
+  searchQuery = '';
+  isUserMenuOpen = signal(false);
 
-    toggleUserMenu() {
-        this.isUserMenuOpen.update((v: boolean) => !v);
+  toggleUserMenu() {
+    this.isUserMenuOpen.update((v: boolean) => !v);
+  }
+
+  logout() {
+    this.authService.logout();
+    this.isUserMenuOpen.set(false);
+  }
+
+  onSearch() {
+    if (this.searchQuery.trim()) {
+      // Implementar lógica de busca real ou navegação para página de resultados
+
+      // Exemplo: this.router.navigate(['/dashboard/search'], { queryParams: { q: this.searchQuery } });
     }
+  }
 
-    logout() {
-        this.authService.logout();
-        this.isUserMenuOpen.set(false);
-    }
-
-    onSearch() {
-        if (this.searchQuery.trim()) {
-            // Implementar lógica de busca real ou navegação para página de resultados
-            console.log('Searching for:', this.searchQuery);
-            // Exemplo: this.router.navigate(['/dashboard/search'], { queryParams: { q: this.searchQuery } });
-        }
-    }
-
-    getInitials(name: string | undefined): string {
-        if (!name) return 'U';
-        return name
-            .split(' ')
-            .map(n => n[0])
-            .slice(0, 2)
-            .join('')
-            .toUpperCase();
-    }
+  getInitials(name: string | undefined): string {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
 }

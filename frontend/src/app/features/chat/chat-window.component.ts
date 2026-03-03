@@ -109,7 +109,6 @@ export class ChatWindowComponent implements OnInit {
             this.connectionStatus.set('connected');
           })
           .catch(err => {
-            console.error('ChatWindow: Firebase custom token sign-in failed:', err);
             this.connectionStatus.set('error');
             this.errorMessage.set('Erro na autenticação do chat: ' + err.message);
           });
@@ -132,7 +131,7 @@ export class ChatWindowComponent implements OnInit {
   loadCommunityDetails(id: string): void {
     this.communityService.getCommunityById(id).subscribe({
       next: (c) => this.community.set(c),
-      error: (err) => console.error('Failed to load community', err)
+      error: (_err) => { }
     });
   }
 
@@ -149,7 +148,6 @@ export class ChatWindowComponent implements OnInit {
             this.messages.set([...msgs].reverse());
           },
           error: (err) => {
-            console.error('ChatWindow: Error fetching messages:', err);
             this.errorMessage.set('Erro ao carregar mensagens: ' + err.message);
           }
         });
@@ -172,7 +170,6 @@ export class ChatWindowComponent implements OnInit {
       });
       this.newMessage.set('');
     } catch (err: any) {
-      console.error('ChatWindow: Error sending message', err);
       alert('Erro ao enviar mensagem: ' + err.message);
     }
   }

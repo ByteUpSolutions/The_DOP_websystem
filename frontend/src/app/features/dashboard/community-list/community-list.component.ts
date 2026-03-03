@@ -64,7 +64,7 @@ export class CommunityListComponent implements OnInit {
         const ids = new Set(memberships.map((m: Membership) => m.community.id));
         this.myCommunityIds.set(ids);
       },
-      error: (err: any) => console.error('Erro ao carregar minhas comunidades', err)
+      error: (_err: any) => { }
     });
   }
 

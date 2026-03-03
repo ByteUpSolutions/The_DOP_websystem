@@ -157,8 +157,7 @@ export class PostDetailComponent implements OnInit {
         next: (updatedPost) => {
           this.post.set(updatedPost);
         },
-        error: (err) => {
-          console.error('Error voting:', err);
+        error: (_err) => {
         }
       });
     }

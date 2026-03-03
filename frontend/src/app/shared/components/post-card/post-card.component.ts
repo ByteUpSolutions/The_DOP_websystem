@@ -43,8 +43,7 @@ export class PostCardComponent {
       next: (updatedPost: Post) => {
         this.post = updatedPost;
       },
-      error: (error: unknown) => {
-        console.error('Error voting on post:', error);
+      error: (_error: unknown) => {
       }
     });
   }
