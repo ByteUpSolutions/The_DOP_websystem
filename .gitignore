@@ -11,6 +11,8 @@ bazel-out/
 *.swp
 *.swo
 .DS_Store
+.agents/
+.project_context/
 
 # Build artifacts
 target/
